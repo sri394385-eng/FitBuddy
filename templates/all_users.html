@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}FitBuddy | All Users{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow">ADMIN / COACH VIEW</span><h1>All Users & Plans</h1></div><a class="btn secondary" href="/">Home</a></div>
+<div class="card table-card">
+  {% if users %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>User</th><th>Age</th><th>Weight</th><th>Goal</th><th>Intensity</th><th>Original Plan</th><th>Updated Plan</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for user in users %}
+      <tr>
+        <td><strong>{{ user.username }}</strong><br><span class="muted">{{ user.user_id }}</span></td>
+        <td>{{ user.age }}</td><td>{{ user.weight }} kg</td><td>{{ user.goal }}</td><td>{{ user.intensity }}</td>
+        <td><details><summary>View</summary><pre>{{ user.plan.original_plan if user.plan else '—' }}</pre></details></td>
+        <td><details><summary>View</summary><pre>{{ user.plan.updated_plan if user.plan and user.plan.updated_plan else 'No update' }}</pre></details></td>
+        <td><button class="danger-btn" onclick="deleteUser('{{ user.user_id }}')">Delete</button></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<p>No users yet. Generate a plan from the home page.</p>{% endif %}
+</div>
+<script>
+async function deleteUser(userId) {
+  if (!confirm('Delete this user and their saved plan?')) return;
+  const response = await fetch('/api/users/' + encodeURIComponent(userId), {method:'DELETE'});
+  if (response.ok) location.reload();
+  else alert('Delete failed. If ADMIN_KEY is configured, send it as the X-Admin-Key header through the API instead.');
+}
+</script>
+{% endblock %}
